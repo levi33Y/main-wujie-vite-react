@@ -4,38 +4,61 @@ import {
   RouteObject,
   RouterProvider,
 } from "react-router-dom";
-import {Home} from "../page/home";
-import {MicroWebrtc} from "../page/micro/micro-webrtc";
-import {MicroReactDom} from "../page/micro/micro-react-dom";
-import {Micro} from "../page/micro";
+import { Application } from "../page/application";
+import { Home } from "../page/home";
+import { Internal } from "../page/internal";
+import { Micro } from "../page/micro";
+import { MicroReactDom } from "../page/micro/micro-react-dom";
+import { MicroWebrtc } from "../page/micro/micro-webrtc";
+import { Service } from "../page/service";
 
 export const main: RouteObject = {
   path: "/home",
   element: <Home />,
+  children: [
+    {
+      path: "application",
+      element: <Application />,
+    },
+    {
+      path: "internal",
+      element: <Internal />,
+    },
+    {
+      path: "service",
+      element: <Service />,
+      children: [
+        {
+          path: "system",
+          element: <MicroReactDom />,
+        },
+        {
+          path: "Personalized",
+          element: <MicroWebrtc />,
+        },
+      ],
+    },
+  ],
 };
 
 export const micro: RouteObject = {
   path: "/micro",
-  element: <Micro/>,
+  element: <Micro />,
   children: [
-    {
-      index: true,
-      element: <Navigate to={"/"} replace />,
-    },
     {
       path: "/micro/webrtc",
       handle: {
-        name: "webrtc"
+        name: "webrtc",
       },
       element: <MicroWebrtc />,
     },
     {
       path: "/micro/reactDom",
       handle: {
-        name: "reactDom"
+        name: "reactDom",
       },
       element: <MicroReactDom />,
-    }
+    },
   ],
 };
 

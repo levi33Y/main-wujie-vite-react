@@ -33,7 +33,7 @@ export const main: RouteObject = {
           element: <MicroReactDom />,
         },
         {
-          path: "Personalized",
+          path: "personalized",
           element: <MicroWebrtc />,
         },
       ],

@@ -11,7 +11,6 @@ type MenuItem = Required<MenuProps>["items"][number];
 
 export const Home = () => {
   const [keepLightKey, setKeepLightKey] = useState<string>("");
-
   const navigate = useNavigate();
 
   const jump = (url: string) => {
@@ -65,11 +64,11 @@ export const Home = () => {
           ),
         },
         {
-          key: "service/system",
+          key: "service/personalized",
           label: (
             <div
               onClick={() => {
-                jump("service/system");
+                jump("service/personalized");
               }}
             >
               个性化配置

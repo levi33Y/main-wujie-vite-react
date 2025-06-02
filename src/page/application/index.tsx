@@ -1,6 +1,8 @@
 import { message } from "antd";
 import * as React from "react";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import {Fragment, useEffect, useMemo, useRef, useState} from "react";
+import {isNil, isNotNil} from "ramda";
+import RecordRTC from "recordrtc";
 
 const RENDERERMAX = 200000;
 
@@ -81,13 +83,78 @@ const Container = ({ show }: { show: boolean }) => {
 export const Application = () => {
   const [show, setShow] = useState(false);
 
+  const abc = useRef<HTMLDivElement>()
+
+  const [a,setA] = useState(false)
+
+  const [record,setRecord] = useState<RecordRTC | null>()
+
+  const videoRef = useRef<HTMLVideoElement>()
+
+  const recRecording =  async () => {
+    if(isNotNil(record)) {
+      record.stopRecording()
+
+      const recordResult = record.toURL()
+
+      if (videoRef.current) {
+        videoRef.current.src = recordResult;
+      }
+    } else {
+      navigator.mediaDevices.getDisplayMedia({
+        video: {
+          video: true, // 获取视频流
+          audio: false, // 如果需要获取音频流 (可选)
+        } as MediaTrackConstraints,
+        audio: false,
+      }).then((screen)=>{
+        const recorda = new RecordRTC(screen, {
+          type: 'video',
+          mimeType: 'video/webm;codecs=vp9',
+        })
+
+        recorda.startRecording()
+
+        setRecord(recorda)
+
+        navigator.mediaDevices
+          .getUserMedia({
+            video: {
+              mandatory: {
+                chromeMediaSource: "desktop",
+                chromeMediaSourceId: screen.id,
+              },
+            } as MediaTrackConstraints,
+            audio: false,
+          })
+      }).catch((e)=>{
+        console.log(e?.message)
+      })
+    }
+  }
+
   return (
     <>
-      <div className="pb-10 flex gap-4">
-        <button onClick={() => setShow(true)}>执行长任务</button>
-        <button onClick={() => message.success("点击了Other")}>Other</button>
-      </div>
-      <Container show={show} />
+    <div className="pb-10 flex gap-4">
+      <button onClick={() => setShow(true)}>执行长任务</button>
+      <button onClick={() => message.success("点击了Other")}>Other</button>
+      <button onClick={() => recRecording()}>{isNil(record) ? "錄製" : "結束"}</button>
+    </div>
+
+      <video className={ "w-[50%]"}
+             ref={videoRef}
+             controls
+      controlslist={"noplaybackrate nodownload"}
+      disablePictureInPicture
+      >
+    </video>
+  {/*<Container show={show} />
+      <div ref={abc} className="w-40 h-80 bg-black" onClick={()=>{
+        // @ts-ignore
+        abc.current.style.background = a ? 'rgba(205,35,35,1)' : 'rgba(255,255,255,0)'
+
+        setA(!a)
+      }}></div>*/}
     </>
   );
 };
